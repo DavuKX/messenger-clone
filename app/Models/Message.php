@@ -2,15 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
+/**
+ * @mixin Builder
+ * @property int $id
+ * @property string $message
+ * @property int $sender_id
+ * @property int $receiver_id
+ */
 class Message extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'message',
         'sender_id',
