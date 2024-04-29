@@ -3,15 +3,25 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @mixin Builder
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property bool $is_admin
  * @property $groups
+ * @property Carbon created_at
+ * @property Carbon updated_at
+ * @property Carbon blocked_at
  */
 class User extends Authenticatable
 {
@@ -40,6 +50,49 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public static function getUsersExceptUser(User $user): Collection|array
+    {
+        $userId = $user->id;
+        $query = (new User)->select([
+            'users.*',
+            'messages.message as last_message',
+            'messages.created_at as last_message_date',
+        ])
+            ->where('users.id', '!=', $userId)
+            ->when(!$user->is_admin, function ($query) {
+                $query->whereNull('users.blocked_at');
+            })->leftJoin('conversations', function ($join) use ($userId) {
+                $join
+                    ->on('conversations.user_id1', '=', 'users.id')
+                    ->where('conversations.user_id2', '=', $userId)
+                    ->orWhere(function ($query) use ($userId) {
+                        $query
+                            ->on('conversations.user_id2', '=', 'users.id')
+                            ->where('conversations.user_id1', '=', $userId);
+                    });
+            })
+            ->leftJoin('messages', 'messages.id', '=', 'conversations.last_message_id')
+            ->orderByRaw('IFNULL(users.blocked_at, 1)')
+            ->orderBy('messages.created_at', 'desc')
+            ->orderBy('users.name');
+        return $query->get();
+    }
+
+    public function toConversationArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'is_group' => false,
+            'is_admin' => $this->is_admin,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'blocked_at' => $this->blocked_at,
+            'last_message' => $this->last_message,
+            'last_message_date' => $this->last_message_date,
+        ];
+    }
 
     /**
      * Get the attributes that should be cast.
