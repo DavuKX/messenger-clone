@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * @mixin Builder
@@ -79,13 +77,14 @@ class User extends Authenticatable
         return $query->get();
     }
 
-    public function toConversationArray()
+    public function toConversationArray(): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
             'is_group' => false,
             'is_admin' => $this->is_admin,
+            'is_user' => true,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'blocked_at' => $this->blocked_at,
