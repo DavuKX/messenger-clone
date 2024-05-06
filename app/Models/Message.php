@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $message
  * @property int $sender_id
  * @property int $receiver_id
+ * @property int $group_id
+ * @property User $sender
+ * @property User $receiver
+ * @property Group $group
+ * @property MessageAttachment[] $attachments
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class Message extends Model
 {

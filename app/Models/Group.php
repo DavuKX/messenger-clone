@@ -54,6 +54,14 @@ class Group extends Model
         return $query->get();
     }
 
+    public static function updateGroupWithMessage(int $groupId, Model|Message $message)
+    {
+        return self::updateOrCreate(
+            ['id' => $groupId],
+            ['last_message_id' => $message->id]
+        );
+    }
+
     public function toConversationArray(): array
     {
         return [
