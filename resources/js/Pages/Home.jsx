@@ -5,17 +5,44 @@ import {useEffect, useRef, useState} from "react";
 import ConversationHeader from "@/Components/App/ConversationHeader.jsx";
 import MessageItem from "@/Components/App/MessageItem.jsx";
 import MessageInput from "@/Components/App/MessageInput.jsx";
+import {useEventBus} from "@/EventBus.jsx";
 
 function Home({ selectedConversation = null, messages = null }) {
     const [localMessages, setLocalMessages] = useState([]);
     const messageCtrRef = useRef(null);
+    const { on } = useEventBus();
+
+    const messageCreated = (message) => {
+        if (
+            selectedConversation &&
+            selectedConversation.is_group &&
+            parseInt(selectedConversation.id) === parseInt(message.group_id)
+        ) {
+            setLocalMessages((prevMessages) => [...prevMessages, message]);
+        }
+
+        if (
+            selectedConversation &&
+            selectedConversation.is_user &&
+            (parseInt(selectedConversation.id) === parseInt(message.sender_id) ||
+            parseInt(selectedConversation.id) === parseInt(message.receiver_id))
+        ) {
+            setLocalMessages((prevMessages) => [...prevMessages, message]);
+        }
+    }
 
     useEffect(() => {
         setTimeout(() => {
             if (messageCtrRef.current) {
                 messageCtrRef.current.scrollTop = messageCtrRef.current.scrollHeight;
             }
-        }, 10)
+        }, 10);
+
+        const offCreated = on('message.created', messageCreated);
+
+        return () => {
+            offCreated();
+        };
     }, [selectedConversation]);
 
     useEffect(() => {
