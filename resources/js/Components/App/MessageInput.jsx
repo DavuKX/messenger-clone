@@ -14,6 +14,10 @@ const MessageInput = ({ conversation = null }) => {
     const [messageSending, setMessageSending] = useState(false);
 
     const onSendClick = () => {
+        if (messageSending) {
+            return;
+        }
+
         if (newMessage.trim() === '') {
             setInputErrorMessage('Please provide a message or upload attachments.');
             setTimeout(() => {
@@ -21,6 +25,7 @@ const MessageInput = ({ conversation = null }) => {
             }, 3000);
             return;
         }
+
         const formData = new FormData();
         formData.append('message', newMessage);
 
@@ -72,7 +77,7 @@ const MessageInput = ({ conversation = null }) => {
                         onSend={onSendClick}
                         onChange={(e) => setNewMessage(e.target.value)}
                     />
-                    <button onClick={onSendClick} className="btn btn-info rounded-1-none">
+                    <button onClick={onSendClick} disabled={messageSending} className="btn btn-info rounded-1-none">
                         {messageSending && (
                             <span className="loading loading-spinner loading-xs"/>
                         )}
