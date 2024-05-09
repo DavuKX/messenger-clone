@@ -7,6 +7,8 @@ import {
     PhotoIcon
 } from "@heroicons/react/24/solid/index.js";
 import NewMessageInput from "@/Components/App/NewMessageInput.jsx";
+import EmojiPicker from "emoji-picker-react";
+import {Popover} from "@headlessui/react";
 
 const MessageInput = ({ conversation = null }) => {
     const [newMessage, setNewMessage] = useState('');
@@ -49,6 +51,24 @@ const MessageInput = ({ conversation = null }) => {
         });
     };
 
+    const onLikeClick = () => {
+        if (messageSending) {
+            return;
+        }
+
+        const data = {
+            message: "👍",
+        }
+
+        if (conversation.is_user) {
+            data['receiver_id'] = conversation.id;
+        } else if (conversation.is_group) {
+            data['group_id'] = conversation.id;
+        }
+
+        axios.post(route("message.store"), data)
+            .then((response) => {})
+    };
     return (
         <div className="flex flex-wrap items-start border-t border-slate-700 py-3">
             <div className="order-2 flex-1 xs:flex-none xs:order-1 p-2">
@@ -90,10 +110,20 @@ const MessageInput = ({ conversation = null }) => {
                 )}
             </div>
             <div className="order-3 xs:order-3 p-2 flex">
-                <button className="p-1 text-gray-500 hover:text-gray-700">
-                    <FaceSmileIcon className="w-6 h-6"/>
-                </button>
-                <button className="p-1 text-gray-500 hover:text-gray-700">
+                <Popover className="relative">
+                    <Popover.Button className="p-1 text-gray-500 hover:text-gray-700">
+                        <FaceSmileIcon className="w-6 h-6"/>
+                    </Popover.Button>
+                    <Popover.Panel className="absolute z-10 right-0 bottom-full">
+                        <EmojiPicker
+                            disableAutoFocus={true}
+                            onEmojiClick={(event) => {
+                                setNewMessage(newMessage + event.emoji);
+                            }}
+                        />
+                    </Popover.Panel>
+                </Popover>
+                <button onClick={onLikeClick} className="p-1 text-gray-500 hover:text-gray-700">
                     <HandThumbUpIcon className="w-6 h-6"/>
                 </button>
             </div>
