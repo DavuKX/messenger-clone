@@ -12,6 +12,7 @@ import {Popover} from "@headlessui/react";
 import AttachmentPreview from "@/Components/App/AttachmentPreview.jsx";
 import CustomAudioPlayer from "@/Components/App/CustomAudioPlayer.jsx";
 import {isAudio, isImage} from "@/helpers.js";
+import AudioRecorder from "@/Components/App/AudioRecorder.jsx";
 
 const MessageInput = ({ conversation = null }) => {
     const [newMessage, setNewMessage] = useState('');
@@ -19,6 +20,15 @@ const MessageInput = ({ conversation = null }) => {
     const [messageSending, setMessageSending] = useState(false);
     const [chosenFiles, setChosenFiles] = useState([]);
     const [uploadProgress, setUploadProgress] = useState(0);
+
+    const recordedAudioReady = (file, url) => {
+        setChosenFiles((prevFiles) => {
+            return [...prevFiles, {
+                file,
+                url,
+            }];
+        });
+    }
 
     const onFileChange = (event) => {
         const files = event.target.files;
@@ -101,7 +111,7 @@ const MessageInput = ({ conversation = null }) => {
         <div className="flex flex-wrap items-start border-t border-slate-700 py-3">
             <div className="order-2 flex-1 xs:flex-none xs:order-1 p-2">
                 <button className="p-1 text-gray-500 hover:text-gray-700 relative">
-                    <PaperClipIcon className="w-6 h-6"/>
+                    <PaperClipIcon className="w-6"/>
                     <input
                         type="file"
                         multiple
@@ -110,7 +120,7 @@ const MessageInput = ({ conversation = null }) => {
                     />
                 </button>
                 <button className="p-1 text-gray-500 hover:text-gray-700 relative">
-                    <PhotoIcon className="w-6 h-6"/>
+                    <PhotoIcon className="w-6"/>
                     <input
                         type="file"
                         multiple
@@ -119,6 +129,7 @@ const MessageInput = ({ conversation = null }) => {
                         className="absolute left-0 top-0 right-0 bottom-0 z-20 opacity-0 cursor-pointer"
                     />
                 </button>
+                <AudioRecorder fileReady={recordedAudioReady}/>
             </div>
             <div className="order-1 px-3 xs:p-0 min-w-[220px] basis-full xs:basis-0 xs:order-2 flex-1 relative">
                 <div className="flex">
