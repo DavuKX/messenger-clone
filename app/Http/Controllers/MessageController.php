@@ -85,11 +85,13 @@ class MessageController extends Controller
                 $directory = 'attachments/' . Str::random(32);
                 Storage::makeDirectory($directory);
 
+                $path = $file->storeAs($directory, $file->getClientOriginalName(), 'public');
+
                 $model = [
                     'message_id' => $message->id,
                     'name' => $file->getClientOriginalName(),
                     'mime' => $file->getClientMimeType(),
-                    'path' => $directory,
+                    'path' => $path,
                     'size' => $file->getSize(),
                 ];
                 $attachment = (new MessageAttachment)->create($model);
