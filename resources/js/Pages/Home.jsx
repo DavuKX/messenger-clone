@@ -7,6 +7,7 @@ import MessageItem from "@/Components/App/MessageItem.jsx";
 import MessageInput from "@/Components/App/MessageInput.jsx";
 import {useEventBus} from "@/EventBus.jsx";
 import axios from "axios";
+import AttachmentPreviewModal from "@/Components/App/AttachmentPreviewModal.jsx";
 
 function Home({ selectedConversation = null, messages = null }) {
     const [localMessages, setLocalMessages] = useState([]);
@@ -14,7 +15,17 @@ function Home({ selectedConversation = null, messages = null }) {
     const messageCtrRef = useRef(null);
     const [scrollFromBottom, setScrollFromBottom] = useState(0);
     const [noMoreMessages, setNoMoreMessages] = useState(false);
+    const [showAttachmentPreview, setShowAttachmentPreview] = useState(false);
+    const [previewAttachment, setPreviewAttachment] = useState({});
     const { on } = useEventBus();
+
+    const onAttachmentClick = (attachments, index) => {
+        setPreviewAttachment({
+            attachments: attachments,
+            index: index,
+        });
+        setShowAttachmentPreview(true);
+    }
 
     const loadMoreMessages = useCallback(() => {
         if (noMoreMessages) {
@@ -132,13 +143,21 @@ function Home({ selectedConversation = null, messages = null }) {
                             <div className="flex-1 flex flex-col">
                                 <div ref={loadMoreIntersect}></div>
                                 {localMessages.map((message) => (
-                                    <MessageItem key={message.id} message={message} />
+                                    <MessageItem key={message.id} message={message} attachmentClick={onAttachmentClick} />
                                 ))}
                             </div>
                         )}
                     </div>
                     <MessageInput conversation={selectedConversation} />
                 </>
+            )}
+            {previewAttachment.attachments && (
+                <AttachmentPreviewModal
+                    attachments={previewAttachment.attachments}
+                    index={previewAttachment.index}
+                    show={showAttachmentPreview}
+                    onClose={() => setShowAttachmentPreview(false)}
+                />
             )}
         </>
     );
