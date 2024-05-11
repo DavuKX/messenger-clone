@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Observers\MessageObserver;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
+#[ObservedBy(MessageObserver::class)]
 class Message extends Model
 {
     use HasFactory;

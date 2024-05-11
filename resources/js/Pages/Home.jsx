@@ -19,6 +19,29 @@ function Home({ selectedConversation = null, messages = null }) {
     const [previewAttachment, setPreviewAttachment] = useState({});
     const { on } = useEventBus();
 
+    const messageDeleted = ({ message }) => {
+        if (
+            selectedConversation &&
+            selectedConversation.is_group &&
+            parseInt(selectedConversation.id) === parseInt(message.group_id)
+        ) {
+            setLocalMessages((prevMessages) => {
+                return prevMessages.filter((msg) => msg.id !== message.id);
+            });
+        }
+
+        if (
+            selectedConversation &&
+            selectedConversation.is_user &&
+            (parseInt(selectedConversation.id) === parseInt(message.sender_id) ||
+                parseInt(selectedConversation.id) === parseInt(message.receiver_id))
+        ) {
+            setLocalMessages((prevMessages) => {
+                return prevMessages.filter((msg) => msg.id !== message.id);
+            });
+        }
+    }
+
     const onAttachmentClick = (attachments, index) => {
         setPreviewAttachment({
             attachments: attachments,
@@ -77,11 +100,14 @@ function Home({ selectedConversation = null, messages = null }) {
         }, 10);
 
         const offCreated = on('message.created', messageCreated);
+        const offDeleted = on('message.deleted', messageDeleted);
+
         setScrollFromBottom(0);
         setNoMoreMessages(false);
 
         return () => {
             offCreated();
+            offDeleted();
         };
     }, [selectedConversation]);
 
