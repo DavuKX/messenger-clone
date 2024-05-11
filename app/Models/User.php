@@ -9,12 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @mixin Builder
  * @property int $id
  * @property string $name
  * @property string $email
+ * @property string $avatar
  * @property bool $is_admin
  * @property $groups
  * @property Carbon created_at
@@ -81,6 +83,7 @@ class User extends Authenticatable
     {
         return [
             'id' => $this->id,
+            'avatar_url' => $this->avatar ? Storage::url($this->avatar) : null,
             'name' => $this->name,
             'is_group' => false,
             'is_admin' => $this->is_admin,
