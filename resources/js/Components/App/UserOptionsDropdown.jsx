@@ -1,8 +1,11 @@
 import React, {Fragment} from 'react';
 import {Menu, Transition} from "@headlessui/react";
 import {EllipsisVerticalIcon, LockClosedIcon, LockOpenIcon, UserIcon} from "@heroicons/react/24/solid/index.js";
+import {ShieldCheckIcon} from "@heroicons/react/16/solid/index.js";
+import {useEventBus} from "@/EventBus.jsx";
 
 const UserOptionsDropdown = ({ conversation }) => {
+    const {emit} = useEventBus();
     const changeUserRole = () => {
         if (!conversation.is_user) {
             return;
@@ -10,6 +13,7 @@ const UserOptionsDropdown = ({ conversation }) => {
 
         axios.post(route("user.changeRole", conversation.id))
             .then((res) => {
+                emit("toast.show", res.data.message)
                 console.log(res.data)
             })
             .catch((err) => {
@@ -24,6 +28,7 @@ const UserOptionsDropdown = ({ conversation }) => {
 
         axios.post(route("user.blockUnblock", conversation.id))
             .then((res) => {
+                emit("toast.show", res.data.message)
                 console.log(res.data)
             })
             .catch((err) => {
@@ -95,7 +100,7 @@ const UserOptionsDropdown = ({ conversation }) => {
                                         )}
                                         {!conversation.is_admin && (
                                             <>
-                                                <UserIcon className="w-4 h-4 mr-2" />
+                                                <ShieldCheckIcon className="w-4 h-4 mr-2" />
                                                 Make Admin
                                             </>
                                         )}
