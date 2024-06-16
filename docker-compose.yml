@@ -5,21 +5,21 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: laravel_app
-        container_name: laravel_app
+        image: messenger_clone_app
+        container_name: messenger_clone_app_container
         restart: unless-stopped
         working_dir: /var/www
         volumes:
             - .:/var/www
             - ./docker/php/local.ini:/usr/local/etc/php/default.conf/local.ini
         networks:
-            - laravel
+            - messenger-clone-network
         ports:
             - "8080:8080"
 
     nginx:
         image: nginx:alpine
-        container_name: nginx
+        container_name: messenger_clone_nginx
         restart: unless-stopped
         ports:
             - "80:80"
@@ -28,26 +28,27 @@ services:
             - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
             - ./docker/nginx/snippets:/etc/nginx/snippets
         networks:
-            - laravel
+            - messenger-clone-network
 
 
     mysql:
         image: mysql:8.0
-        container_name: mysql
+        container_name: messenger_clone_mysql
         restart: unless-stopped
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
             MYSQL_DATABASE: ${DB_DATABASE}
-            MYSQL_USER: ${DB_USERNAME}
             MYSQL_PASSWORD: ${DB_PASSWORD}
         volumes:
             - mysql_data:/var/lib/mysql
         networks:
-            - laravel
+            - messenger-clone-network
+        ports:
+            - "3306:3306"
 
     npm:
         image: node:20.4-alpine
-        container_name: node
+        container_name: messenger_clone_node
         working_dir: /var/www
         ports:
             - "3000:3000"
@@ -56,10 +57,10 @@ services:
         command: >
             sh -c "npm install && npm run dev"
         networks:
-            - laravel
+            - messenger-clone-network
 
 networks:
-    laravel:
+    messenger-clone-network:
 
 volumes:
     mysql_data:
